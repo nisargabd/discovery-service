@@ -45,13 +45,23 @@ jobs:
             echo "</details>"
           } > govulncheck-comment.md
 
+      - name: Find existing govulncheck comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        id: find-govulncheck-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- sec-scan:govulncheck -->"
+
       - name: Comment govulncheck report on PR
         if: github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v4
         with:
+          comment-id: ${{ steps.find-govulncheck-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          comment-tag: govulncheck-scan
           body-path: govulncheck-comment.md
+          edit-mode: replace
 
       # Base images are dhi.io/*, a Docker Hardened Images registry gated on a
       # Docker subscription — anonymous pulls 401. Same login a local build
@@ -99,13 +109,23 @@ jobs:
             echo "</details>"
           } > trivy-comment.md
 
+      - name: Find existing Trivy comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        id: find-trivy-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- sec-scan:trivy-image -->"
+
       - name: Comment Trivy report on PR
         if: github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v4
         with:
+          comment-id: ${{ steps.find-trivy-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          comment-tag: trivy-scan
           body-path: trivy-comment.md
+          edit-mode: replace
 
       # Gate the PR on the same findings the comments above already showed.
       - name: Trivy image scan (gate)
