@@ -36,11 +36,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # GHCR image refs must be lowercase; github.repository_owner preserves
+      # the owner's real case (OpenAgriNet), so it can't be used as-is. This
+      # resolves to whichever account or org owns the repo the tag was pushed
+      # to — a fork pushes under the fork owner, no per-person edit needed.
+      - name: Set image owner
+        run: echo "OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/openagrinet/discovery-service:${{ github.ref_name }}
-            ghcr.io/openagrinet/discovery-service:latest
+            ghcr.io/${{ env.OWNER }}/discovery-service:${{ github.ref_name }}
+            ghcr.io/${{ env.OWNER }}/discovery-service:latest
