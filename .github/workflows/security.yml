@@ -75,7 +75,7 @@ jobs:
         run: docker build -t discovery-service:${{ github.sha }} .
 
       - name: Trivy image scan (report)
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: discovery-service:${{ github.sha }}
           severity: HIGH,CRITICAL
@@ -109,7 +109,7 @@ jobs:
 
       # Gate the PR on the same findings the comments above already showed.
       - name: Trivy image scan (gate)
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: discovery-service:${{ github.sha }}
           severity: HIGH,CRITICAL
